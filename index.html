@@ -18,7 +18,7 @@
       background:rgba(255,255,255,.95);backdrop-filter:blur(20px);
       border-radius:24px;padding:2.5rem;
       box-shadow:0 25px 50px rgba(0,0,0,.15);
-      max-width:550px;width:100%;text-align:center;
+      max-width:650px;width:100%;text-align:center;
       border:1px solid rgba(255,255,255,.3)
     }
     .page{display:none}.page.active{display:block}
@@ -57,7 +57,7 @@
     }
     .run-btn{
       background:linear-gradient(45deg,#4CAF50,#45a049);
-      color:#fff;border:none;width:200px;height:70px;
+      color:#fff;border:none;width:220px;height:70px;
       border-radius:20px;font-size:1.6rem;font-weight:800;
       cursor:pointer;position:relative;overflow:hidden;
       box-shadow:0 10px 30px rgba(76,175,80,.4);
@@ -77,35 +77,69 @@
       50%{box-shadow:0 0 20px rgba(76,175,80,.8)}
       100%{box-shadow:0 10px 30px rgba(76,175,80,.4)}
     }
-    .result-container{
-      display:flex;justify-content:space-between;
-      gap:2rem;margin:2rem 0;
+
+    /* SUGGESTIONS LIST FOR NCS */
+    .suggestions { position:relative; }
+    .suggestions-list{
+      position:absolute;top:105%;left:50%;transform:translateX(-50%);
+      width:100%;max-width:280px;
+      background:#fff;border-radius:12px;
+      box-shadow:0 10px 25px rgba(0,0,0,.15);
+      border:1px solid #e1e5e9;
+      z-index:20;max-height:220px;overflow:auto;
     }
-    .color-half{
-      flex:1;height:200px;border-radius:20px;
-      position:relative;box-shadow:0 15px 35px rgba(0,0,0,.2);
-      overflow:hidden;
+    .suggestion-item{
+      padding:.6rem .9rem;font-size:.95rem;
+      display:flex;justify-content:space-between;align-items:center;
+      cursor:pointer;transition:background .15s;
     }
-    .color-half.left{border-top-right-radius:0;border-bottom-right-radius:0}
-    .color-half.right{border-top-left-radius:0;border-bottom-left-radius:0}
-    .color-info{
-      position:absolute;bottom:0;left:0;right:0;
-      background:rgba(0,0,0,.78);color:#fff;
-      padding:1.2rem;text-align:center;
+    .suggestion-item:hover{background:#f1f3f5}
+    .suggestion-code{font-weight:700;margin-right:.6rem}
+    .suggestion-name{color:#555;font-size:.9rem}
+
+    /* RESULT: BIG SPLIT CIRCLE */
+    .result-circle-wrapper{
+      margin:1.5rem auto 1.8rem;
+      display:flex;justify-content:center;align-items:center;
     }
-    .color-code{font-size:1.3rem;font-weight:700;letter-spacing:2px;margin-bottom:.3rem}
-    .color-name{font-size:.95rem;opacity:.95;margin-bottom:.4rem}
-    .color-rgb{
-      font-family:'Courier New',monospace;font-size:.9rem;
-      background:rgba(255,255,255,.2);
-      padding:.35rem .8rem;border-radius:8px;display:inline-block;
+    .result-circle{
+      width:260px;height:260px;border-radius:50%;
+      position:relative;
     }
+    .result-half{
+      position:absolute;top:0;left:0;width:100%;height:100%;
+      clip-path:polygon(0 100%,100% 0,0 0);
+    }
+    .result-half.right{
+      clip-path:polygon(100% 0,100% 100%,0 100%);
+    }
+    .result-circle-border{
+      position:absolute;inset:0;border-radius:50%;
+      border:5px solid rgba(255,255,255,.9);pointer-events:none;
+    }
+    .result-meta{
+      display:flex;justify-content:space-between;gap:1rem;
+      margin:0 auto;max-width:520px;
+    }
+    .meta-block{
+      flex:1;background:rgba(0,0,0,.75);
+      color:#fff;padding:1rem 1.1rem;
+      border-radius:14px;font-size:.9rem;
+    }
+    .meta-code{font-weight:700;font-size:1.05rem;margin-bottom:.25rem}
+    .meta-name{margin-bottom:.25rem}
+    .meta-rgb{
+      font-family:'Courier New',monospace;font-size:.85rem;
+      background:rgba(255,255,255,.15);
+      padding:.3rem .6rem;border-radius:8px;display:inline-block;
+    }
+
     .back-btn{
       background:linear-gradient(45deg,#667eea,#764ba2);
       color:#fff;border:none;padding:1rem 2rem;
       border-radius:12px;font-size:1.05rem;font-weight:600;
       cursor:pointer;box-shadow:0 8px 25px rgba(102,126,234,.3);
-      transition:all .3s ease;
+      transition:all .3s ease;margin-top:1.2rem;
     }
     .back-btn:hover{
       transform:translateY(-2px);
@@ -117,10 +151,10 @@
       border-radius:14px;margin:1rem 0;
       font-size:.95rem;font-weight:600;
     }
-    @media(max-width:480px){
+    @media(max-width:600px){
       .input-pair{grid-template-columns:1fr;gap:1rem}
-      .result-container{flex-direction:column;gap:1rem}
-      .color-half{height:150px}
+      .result-circle{width:220px;height:220px}
+      .result-meta{flex-direction:column}
     }
   </style>
 </head>
@@ -142,11 +176,17 @@
       <div class="input-pair">
         <div>
           <label for="color1">Select Colour 1</label>
-          <input type="text" id="color1" placeholder="Code 1" />
+          <div class="suggestions">
+            <input type="text" id="color1" placeholder="Code 1" />
+            <div class="suggestions-list" style="display:none;"></div>
+          </div>
         </div>
         <div>
           <label for="color2">Select Colour 2</label>
-          <input type="text" id="color2" placeholder="Code 2" />
+          <div class="suggestions">
+            <input type="text" id="color2" placeholder="Code 2" />
+            <div class="suggestions-list" style="display:none;"></div>
+          </div>
         </div>
       </div>
 
@@ -163,7 +203,7 @@
     </div>
   </div>
 
-  <!-- Tiny click sound -->
+  <!-- Click sound -->
   <audio id="clickSound">
     <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
   </audio>
@@ -181,73 +221,137 @@
     const resultContainer = document.getElementById('resultContainer');
     const colorSystemSelect = document.getElementById('colorSystem');
     const clickSound = document.getElementById('clickSound');
+    const color1Input = document.getElementById('color1');
+    const color2Input = document.getElementById('color2');
 
-    // Load full database from colors.json
+    const suggLists = document.querySelectorAll('.suggestions-list');
+    color1Input._suggestionList = suggLists[0];
+    color2Input._suggestionList = suggLists[1];
+
+    // Load database
     fetch('colors.json')
       .then(res => res.json())
       .then(data => {
         ralDB = data.ral || {};
         ncsDB = data.ncs || {};
         dataLoaded = true;
-        console.log('Colors loaded:', Object.keys(ralDB).length, 'RAL,', Object.keys(ncsDB).length, 'NCS');
       })
-      .catch(err => {
-        console.error('Error loading colors.json', err);
-        showError('Unable to load colors database (colors.json). Please check the file path.');
+      .catch(() => {
+        showError('Unable to load colours database (colors.json).');
       });
 
-    function showError(msg) {
+    function showError(msg){
       errorBox.textContent = msg;
       errorBox.style.display = 'block';
     }
-
-    function clearError() {
+    function clearError(){
       errorBox.style.display = 'none';
       errorBox.textContent = '';
     }
 
-    function normaliseRAL(code) {
-      return code.replace(/[^0-9]/g, '').padStart(4,'0');
+    function normaliseRAL(code){
+      return code.replace(/[^0-9]/g,'').padStart(4,'0');
     }
-
-    function normaliseNCS(code) {
+    function normaliseNCS(code){
       return code.trim().toUpperCase().replace(/\s+/g,'');
     }
 
-    function lookupColor(system, rawCode) {
-      if (system === 'RAL') {
+    function lookupColor(system, rawCode){
+      if(system === 'RAL'){
         const code = normaliseRAL(rawCode);
-        const data = ralDB[code];
-        if (!data) return null;
-        return { system:'RAL', code: code, name: data.name, rgb: data.rgb };
+        const d = ralDB[code];
+        if(!d) return null;
+        return {system:'RAL', code, name:d.name, rgb:d.rgb};
       } else {
         const code = normaliseNCS(rawCode);
-        const data = ncsDB[code];
-        if (!data) return null;
-        return { system:'NCS', code: code, name: data.name || code, rgb: data.rgb };
+        const d = ncsDB[code];
+        if(!d) return null;
+        return {system:'NCS', code, name:d.name || code, rgb:d.rgb};
+      }
+    }
+    function rgbString(a){ return `rgb(${a[0]}, ${a[1]}, ${a[2]})`; }
+
+    // ---------- SUGGESTIONS FOR NCS ----------
+    function buildSuggestions(inputEl){
+      const system = colorSystemSelect.value;
+      if(system !== 'NCS'){
+        hideSuggestions(inputEl);
+        return;
+      }
+      const digits = inputEl.value.replace(/[^0-9]/g,'');
+      if(digits.length < 4){
+        hideSuggestions(inputEl);
+        return;
+      }
+      const term = digits.slice(0,4);
+      inputEl.value = term;
+
+      const listEl = inputEl._suggestionList;
+      const items = [];
+      const codes = Object.keys(ncsDB);
+
+      for(let i=0;i<codes.length;i++){
+        const code = codes[i];
+        if(code.replace(/\D/g,'').includes(term)){
+          const c = ncsDB[code];
+          items.push({code, name:c.name || code});
+          if(items.length >= 20) break;
+        }
+      }
+
+      if(items.length === 0){
+        hideSuggestions(inputEl);
+        return;
+      }
+
+      listEl.innerHTML = '';
+      items.forEach(item=>{
+        const div = document.createElement('div');
+        div.className = 'suggestion-item';
+        div.innerHTML = `
+          <span class="suggestion-code">${item.code}</span>
+          <span class="suggestion-name">${item.name}</span>
+        `;
+        div.addEventListener('click', ()=>{
+          inputEl.value = item.code;
+          hideSuggestions(inputEl);
+        });
+        listEl.appendChild(div);
+      });
+      listEl.style.display = 'block';
+    }
+
+    function hideSuggestions(inputEl){
+      if(inputEl && inputEl._suggestionList){
+        inputEl._suggestionList.style.display = 'none';
       }
     }
 
-    function rgbString(arr) {
-      return `rgb(${arr[0]}, ${arr[1]}, ${arr[2]})`;
-    }
+    [color1Input,color2Input].forEach(inp=>{
+      inp.addEventListener('input', ()=>buildSuggestions(inp));
+      inp.addEventListener('blur', ()=>setTimeout(()=>hideSuggestions(inp),150));
+    });
 
-    function showResult(c1, c2) {
+    // ---------- RESULT: SPLIT CIRCLE ----------
+    function showResult(c1, c2){
       const html = `
-        <div class="result-container">
-          <div class="color-half left" style="background:${rgbString(c1.rgb)};">
-            <div class="color-info">
-              <div class="color-code">${c1.system} ${c1.code}</div>
-              <div class="color-name">${c1.name}</div>
-              <div class="color-rgb">${rgbString(c1.rgb)}</div>
-            </div>
+        <div class="result-circle-wrapper">
+          <div class="result-circle">
+            <div class="result-half" style="background:${rgbString(c1.rgb)};"></div>
+            <div class="result-half right" style="background:${rgbString(c2.rgb)};"></div>
+            <div class="result-circle-border"></div>
           </div>
-          <div class="color-half right" style="background:${rgbString(c2.rgb)};">
-            <div class="color-info">
-              <div class="color-code">${c2.system} ${c2.code}</div>
-              <div class="color-name">${c2.name}</div>
-              <div class="color-rgb">${rgbString(c2.rgb)}</div>
-            </div>
+        </div>
+        <div class="result-meta">
+          <div class="meta-block">
+            <div class="meta-code">${c1.system} ${c1.code}</div>
+            <div class="meta-name">${c1.name}</div>
+            <div class="meta-rgb">${rgbString(c1.rgb)}</div>
+          </div>
+          <div class="meta-block">
+            <div class="meta-code">${c2.system} ${c2.code}</div>
+            <div class="meta-name">${c2.name}</div>
+            <div class="meta-rgb">${rgbString(c2.rgb)}</div>
           </div>
         </div>
       `;
@@ -256,20 +360,20 @@
       resultPage.classList.add('active');
     }
 
-    runBtn.addEventListener('click', () => {
+    runBtn.addEventListener('click', ()=>{
       clearError();
-      if (clickSound) { clickSound.currentTime = 0; clickSound.play().catch(()=>{}); }
+      if(clickSound){ clickSound.currentTime = 0; clickSound.play().catch(()=>{}); }
 
-      if (!dataLoaded) {
+      if(!dataLoaded){
         showError('Colour data is still loading. Please wait a moment and try again.');
         return;
       }
 
       const system = colorSystemSelect.value;
-      const raw1 = document.getElementById('color1').value;
-      const raw2 = document.getElementById('color2').value;
+      const raw1 = color1Input.value;
+      const raw2 = color2Input.value;
 
-      if (!raw1 || !raw2) {
+      if(!raw1 || !raw2){
         showError('Please enter both Colour 1 and Colour 2 codes.');
         return;
       }
@@ -277,15 +381,15 @@
       const c1 = lookupColor(system, raw1);
       const c2 = lookupColor(system, raw2);
 
-      if (!c1 && !c2) {
+      if(!c1 && !c2){
         showError(`${system} ${raw1} and ${system} ${raw2} not found in database.`);
         return;
       }
-      if (!c1) {
+      if(!c1){
         showError(`${system} ${raw1} not found in database.`);
         return;
       }
-      if (!c2) {
+      if(!c2){
         showError(`${system} ${raw2} not found in database.`);
         return;
       }
@@ -293,7 +397,7 @@
       showResult(c1, c2);
     });
 
-    backBtn.addEventListener('click', () => {
+    backBtn.addEventListener('click', ()=>{
       resultPage.classList.remove('active');
       inputPage.classList.add('active');
     });
