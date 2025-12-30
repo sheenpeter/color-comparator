@@ -97,13 +97,13 @@
     .suggestion-code{font-weight:700;margin-right:.6rem}
     .suggestion-name{color:#555;font-size:.9rem}
 
-    /* RESULT: BIG SPLIT CIRCLE */
-    .result-circle-wrapper{
+    /* RESULT: BIG SPLIT SQUARE */
+    .result-square-wrapper{
       margin:1.5rem auto 1.8rem;
       display:flex;justify-content:center;align-items:center;
     }
-    .result-circle{
-      width:260px;height:260px;border-radius:50%;
+    .result-square{
+      width:260px;height:260px;
       position:relative;
     }
     .result-half{
@@ -112,10 +112,6 @@
     }
     .result-half.right{
       clip-path:polygon(100% 0,100% 100%,0 100%);
-    }
-    .result-circle-border{
-      position:absolute;inset:0;border-radius:50%;
-      border:5px solid rgba(255,255,255,.9);pointer-events:none;
     }
     .result-meta{
       display:flex;justify-content:space-between;gap:1rem;
@@ -153,7 +149,7 @@
     }
     @media(max-width:600px){
       .input-pair{grid-template-columns:1fr;gap:1rem}
-      .result-circle{width:220px;height:220px}
+      .result-square{width:220px;height:220px}
       .result-meta{flex-direction:column}
     }
   </style>
@@ -332,14 +328,13 @@
       inp.addEventListener('blur', ()=>setTimeout(()=>hideSuggestions(inp),150));
     });
 
-    // ---------- RESULT: SPLIT CIRCLE ----------
+    // ---------- RESULT: SPLIT SQUARE ----------
     function showResult(c1, c2){
       const html = `
-        <div class="result-circle-wrapper">
-          <div class="result-circle">
+        <div class="result-square-wrapper">
+          <div class="result-square">
             <div class="result-half" style="background:${rgbString(c1.rgb)};"></div>
             <div class="result-half right" style="background:${rgbString(c2.rgb)};"></div>
-            <div class="result-circle-border"></div>
           </div>
         </div>
         <div class="result-meta">
